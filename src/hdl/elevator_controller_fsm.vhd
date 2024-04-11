@@ -87,7 +87,9 @@ architecture Behavioral of elevator_controller_fsm is
     -- variable type can take on. Now you can assign a signal as 
     -- "sm_floor" the same way you'd assign a signal as std_logic
 	-- how would you modify this to go up to 15 floors?
-	type sm_floor is (s_floor1, s_floor2, s_floor3, s_floor4);
+	type sm_floor is (s_floor1, s_floor2, s_floor3, s_floor4, s_floor5, s_floor6, s_floor7, s_floor8,
+                      s_floor9, s_floor10, s_floor11, s_floor12, s_floor13, s_floor14, s_floor15, s_floor16);
+
 	
 	-- Here you create variables that can take on the values defined above. Neat!	
 	signal f_Q, f_Q_next: sm_floor;
@@ -95,21 +97,61 @@ architecture Behavioral of elevator_controller_fsm is
 begin
 
 	-- CONCURRENT STATEMENTS ------------------------------------------------------------------------------
-	-- Next State Logic
-    f_Q_next <= s_floor2 when (f_Q = s_floor1 and i_up_down = '1') else -- going up
-                s_floor3 when (f_Q = s_floor2 and i_up_down = '1') else
-                s_floor4 when (f_Q = s_floor3 and i_up_down = '1') else
-                s_floor4 when (f_Q = s_floor4 and i_up_down = '1') else
-                s_floor3 when (f_Q = s_floor4 and i_up_down = '0') else -- going down
-                s_floor2 when (f_Q = s_floor3 and i_up_down = '0') else
-                s_floor1; -- default case
+	f_Q_next <= 
+        s_floor2 when (f_Q = s_floor1 and i_up_down = '1') else
+        s_floor3 when (f_Q = s_floor2 and i_up_down = '1') else
+        s_floor4 when (f_Q = s_floor3 and i_up_down = '1') else
+        s_floor5 when (f_Q = s_floor4 and i_up_down = '1') else
+        s_floor6 when (f_Q = s_floor5 and i_up_down = '1') else
+        s_floor7 when (f_Q = s_floor6 and i_up_down = '1') else
+        s_floor8 when (f_Q = s_floor7 and i_up_down = '1') else
+        s_floor9 when (f_Q = s_floor8 and i_up_down = '1') else
+        s_floor10 when (f_Q = s_floor9 and i_up_down = '1') else
+        s_floor11 when (f_Q = s_floor10 and i_up_down = '1') else
+        s_floor12 when (f_Q = s_floor11 and i_up_down = '1') else
+        s_floor13 when (f_Q = s_floor12 and i_up_down = '1') else
+        s_floor14 when (f_Q = s_floor13 and i_up_down = '1') else
+        s_floor15 when (f_Q = s_floor14 and i_up_down = '1') else
+        s_floor16 when (f_Q = s_floor15 and i_up_down = '1') else
+        s_floor16 when (f_Q = s_floor16 and i_up_down = '1') else
+        s_floor15 when (f_Q = s_floor16 and i_up_down = '0') else
+        s_floor14 when (f_Q = s_floor15 and i_up_down = '0') else
+        s_floor13 when (f_Q = s_floor14 and i_up_down = '0') else
+        s_floor12 when (f_Q = s_floor13 and i_up_down = '0') else
+        s_floor11 when (f_Q = s_floor12 and i_up_down = '0') else
+        s_floor10 when (f_Q = s_floor11 and i_up_down = '0') else
+        s_floor9 when (f_Q = s_floor10 and i_up_down = '0') else
+        s_floor8 when (f_Q = s_floor9 and i_up_down = '0') else
+        s_floor7 when (f_Q = s_floor8 and i_up_down = '0') else
+        s_floor6 when (f_Q = s_floor7 and i_up_down = '0') else
+        s_floor5 when (f_Q = s_floor6 and i_up_down = '0') else
+        s_floor4 when (f_Q = s_floor5 and i_up_down = '0') else
+        s_floor3 when (f_Q = s_floor4 and i_up_down = '0') else
+        s_floor2 when (f_Q = s_floor3 and i_up_down = '0') else
+        s_floor1 when (f_Q = s_floor2 and i_up_down = '0') else
+        s_floor1; -- default case
+
   
 	-- Output logic
     with f_Q select
-        o_floor <= "0010" when s_floor2,
+        o_floor <= "0001" when s_floor1,
+                   "0010" when s_floor2,
                    "0011" when s_floor3,
                    "0100" when s_floor4,
-                   "0001" when others; -- default is floor 1
+                   "0101" when s_floor5,
+                   "0110" when s_floor6,
+                   "0111" when s_floor7,
+                   "1000" when s_floor8,
+                   "1001" when s_floor9,
+                   "1010" when s_floor10,
+                   "1011" when s_floor11,
+                   "1100" when s_floor12,
+                   "1101" when s_floor13,
+                   "1110" when s_floor14,
+                   "1111" when s_floor15,
+                   "0000" when s_floor16, -- Explicit encoding for s_floor16 as "0000"
+                   "0001" when others; -- Default is floor 1
+
 	
 	-------------------------------------------------------------------------------------------------------
 	
