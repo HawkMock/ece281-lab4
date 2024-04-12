@@ -115,14 +115,34 @@ architecture top_basys3_arch of top_basys3 is
         );
     end component clock_divider;
     
-    signal w_clk : std_logic;
-    signal w_floor : std_logic_vector(3 downto 0);
+    component hex2dec is
+        Port ( i_hex : in STD_LOGIC_VECTOR (3 downto 0);
+               o_tens : out STD_LOGIC_VECTOR (3 downto 0);
+               o_ones : out STD_LOGIC_VECTOR (3 downto 0)
+             );
+    end component hex2dec;
+    
+    component TDM4 is 
+    generic ( constant k_WIDTH : natural  := 4); -- bits in input and output
+        Port ( i_clk        : in  STD_LOGIC;
+               i_reset        : in  STD_LOGIC; -- asynchronous
+               i_D3         : in  STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
+               i_D2         : in  STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
+               i_D1         : in  STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
+               i_D0         : in  STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
+               o_data        : out STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
+               o_sel        : out STD_LOGIC_VECTOR (3 downto 0)    -- selected data line (one-cold)
+        );
+    end component TDM4;
+     
+    signal w_fast_clk, w_slow_clk : std_logic;
+    signal w_tens, w_ones, w_data, w_anode, w_floor : std_logic_vector(3 downto 0);
   
 begin
 	-- PORT MAPS ----------------------------------------
     elevator_controller_fsm_inst : elevator_controller_fsm
     port map (
-       i_clk        => w_clk,
+       i_clk        => w_slow_clk,
        i_reset      => btnR or btnU,
        i_stop       => sw(0),
        i_up_down    => sw(1),
@@ -131,32 +151,57 @@ begin
      
      sevenSegDecoder_inst : sevenSegDecoder
      port map (
-        i_D => w_floor,
+        i_D => w_data,
         o_S => seg
      );
      
-     clock_divider_inst : clock_divider
+     clock_divider_slow_inst : clock_divider
      generic map ( k_DIV => 25000000 ) -- 4 Hz clock from 100 MHz
      port map (                          
          i_clk   => clk,
          i_reset => btnL or btnU,
-         o_clk   => w_clk
+         o_clk   => w_slow_clk
      ); 
+     
+     clock_divider_fast_inst : clock_divider
+     generic map ( k_DIV => 125000 ) -- 400 Hz clock from 100 MHz
+     port map (                          
+         i_clk   => clk,
+         i_reset => btnL or btnU,
+         o_clk   => w_fast_clk
+     ); 
+     
+     TDM4_inst : TDM4
+     generic map ( k_WIDTH => 4 ) -- bits in input and output
+     port map (
+            i_clk   => w_fast_clk,
+            i_reset => btnU,
+            i_D3    => w_tens,
+            i_D2    => w_ones,
+            i_D1    => x"A",
+            i_D0    => x"B",
+            o_data  => w_data,
+            o_sel   => w_anode
+     );
+     
+     hex2dec_inst : hex2dec
+     port map ( i_hex => w_floor,
+                o_tens => w_tens,
+                o_ones => w_ones
+     );
 	
 	
 	-- CONCURRENT STATEMENTS ----------------------------
 	
 	-- LED 15 gets the FSM slow clock signal. The rest are grounded.
-	led(15) <= w_clk;
+	led(15) <= w_slow_clk;
 	led(14 downto 0) <= (others => '0');
 
 	-- leave unused switches UNCONNECTED. Ignore any warnings this causes.
 	
 	-- wire up active-low 7SD anodes (an) as required
 	-- Tie any unused anodes to power ('1') to keep them off
-    an(3) <= '1';
-	an(2) <= '0';
-    an(1) <= '1';
-    an(0) <= '1';
+    an(3 downto 2) <= w_anode(3 downto 2);
+    an(1 downto 0) <= "11";
 	
 end top_basys3_arch;
