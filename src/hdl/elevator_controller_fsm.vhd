@@ -11,12 +11,12 @@
 --| ---------------------------------------------------------------------------
 --|
 --| FILENAME      : MooreElevatorController.vhd
---| AUTHOR(S)     : Capt Phillip Warner, Capt Dan Johnson, Capt Brian Yarbrough, ***YourName***
---| CREATED       : 03/2018 Last Modified on 06/24/2020
+--| AUTHOR(S)     : Capt Phillip Warner, Capt Dan Johnson, Capt Brian Yarbrough, C3C Dustin Mock
+--| CREATED       : 2018-03 Last Modified on 2024-04-15
 --| DESCRIPTION   : This file implements the ICE5 Basic elevator controller (Moore Machine)
 --|
 --|  The system is specified as follows:
---|   - The elevator controller will traverse four floors (numbered 1 to 4).
+--|   - The elevator controller will traverse four floors (numbered 1 to 16).
 --|   - It has two external inputs, i_up_down and i_stop.
 --|   - When i_up_down is active and i_stop is inactive, the elevator will move up 
 --|			until it reaches the top floor (one floor per clock, of course).
@@ -26,8 +26,9 @@
 --|   - When the elevator is at the top floor, it will stay there until i_up_down 
 --|			goes inactive while i_stop is inactive.  Likewise, it will remain at the bottom 
 --|			until told to go up and i_stop is inactive.  
---|   - The system should output the floor it is on (1 - 4) as a four-bit binary number.
---|   - i_reset synchronously puts the FSM into state Floor 2.
+--|   - The system should output the floor it is on (1 - 16) as a four-bit binary number.
+--|   - Floor 16 is output as "0000"
+--|   - i_reset bisynchronously puts the FSM into state Floor 2.
 --|
 --|		Inputs:   i_clk     --> elevator clk
 --|				  i_reset   --> reset signal
@@ -83,15 +84,12 @@ end elevator_controller_fsm;
 -- Write the code in a similar style as the Lesson 19 ICE (stoplight FSM version 2)
 architecture Behavioral of elevator_controller_fsm is
 
-    -- Below you create a new variable type! You also define what values that 
-    -- variable type can take on. Now you can assign a signal as 
-    -- "sm_floor" the same way you'd assign a signal as std_logic
-	-- how would you modify this to go up to 15 floors?
+    -- Enumerated type with sixteen possible states
 	type sm_floor is (s_floor1, s_floor2, s_floor3, s_floor4, s_floor5, s_floor6, s_floor7, s_floor8,
                       s_floor9, s_floor10, s_floor11, s_floor12, s_floor13, s_floor14, s_floor15, s_floor16);
 
 	
-	-- Here you create variables that can take on the values defined above. Neat!	
+	-- Variables that can take on the values defined above. 
 	signal f_Q, f_Q_next: sm_floor;
 
 begin

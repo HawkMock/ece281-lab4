@@ -11,8 +11,8 @@
 --| ---------------------------------------------------------------------------
 --|
 --| FILENAME      : top_basys3.vhd
---| AUTHOR(S)     : Capt Phillip Warner
---| CREATED       : 3/9/2018  MOdified by Capt Dan Johnson (3/30/2020)
+--| AUTHOR(S)     : Capt Phillip Warner, Capt Dan Johnson, and C3C Dustin Mock
+--| CREATED       : 2018-03-09  Modified on 2024-04-15
 --| DESCRIPTION   : This file implements the top level module for a BASYS 3 to 
 --|					drive the Lab 4 Design Project (Advanced Elevator Controller).
 --|
@@ -21,18 +21,18 @@
 --|							btnR      --> Rst FSM
 --|							btnU      --> Rst Master
 --|							btnC      --> GO (request floor)
---|							sw(15:12) --> Passenger location (floor select bits)
---| 						sw(3:0)   --> Desired location (floor select bits)
---| 						 - Minumum FUNCTIONALITY ONLY: sw(1) --> up_down, sw(0) --> stop
+--|							sw(1) --> up_down
+--|                         sw(0) --> stop
 --|							 
---|					Outputs: led --> indicates elevator movement with sweeping pattern (additional functionality)
---|							   - led(10) --> led(15) = MOVING UP
---|							   - led(5)  --> led(0)  = MOVING DOWN
---|							   - ALL OFF		     = NOT MOVING
+--|					Outputs: led --> indicates the clock speed at which the FSM is updating
+--|							   - led(15) = slow clock (FSM) high
 --|							 an(3:0)    --> seven-segment display anode active-low enable (AN3 ... AN0)
 --|							 seg(6:0)	--> seven-segment display cathodes (CG ... CA.  DP unused)
 --|
---| DOCUMENTATION : None
+--| DOCUMENTATION : I asked Maj Seery for help assigning "subvectors" such as
+--|                 an(3:2) written as an(3 downto 2). I used ChatGPT to formulaicly
+--|                 extend the functionality of my FSM to 16 floors. See prompts here:
+--|                 https://chat.openai.com/share/7c202563-8f2c-47f2-9d29-a4d5e05a4eec
 --|
 --+----------------------------------------------------------------------------
 --|
